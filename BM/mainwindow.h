@@ -24,32 +24,47 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-    QByteArray getInformationAboutObj(QByteArray);
-    void makeLogNote(QString);
+
+    QByteArray getInformationAboutObj( QByteArray );
+
+    void makeLogNote( QString );
+
+     ~MainWindow();
 
 private slots:
-    QString makeDatagram(QString, int *);
+    QString makeDatagram( QString, int * );
+
     void readDatagram();
+
     void on_exitButton_clicked();
+
     void on_updBut_clicked();
+
     void on_clearBut_clicked();
+
     void on_itemSendCoord_triggered();
+
     void setIp();
+
     void on_combObjTableBut_clicked();
+
     void on_logTableBut_3_clicked();
+
+    QString getCurrentDateAndTime();
 
 private:
     Ui::MainWindow *ui;
-    QUdpSocket udpSocket;
-    QTimer timer;
-    QSqlDatabase db;
+
+    QSqlDatabase   db;
+    QUdpSocket     udpSocket;
     QSqlTableModel *model;
+
     QHostAddress myIp;
     QHostAddress targetIp;
-    QString targetPort;
-    QString myPort;
-    Logger *logger;
+    QString      myPort;
+    QString      targetPort;
+
+    Logger    *logger;
     Converter *converter;
 };
 

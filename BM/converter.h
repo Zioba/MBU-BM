@@ -10,21 +10,21 @@ class Converter
 {
 public:
     Converter();
-    //закодировать датаграмму
-    QByteArray encode(QStringList);
-    //раскодировать датаграмму
-    QStringList decode(QByteArray);
-    //приведение длины строки к нужному формату
-    QString dobei(QString, int);
+
+    QByteArray encode( QStringList ); //закодировать датаграмму
+
+    QStringList decode( QByteArray ); //раскодировать датаграмму
+
+    QString dobei( QString, int );  //приведение длины строки к нужному формату
+
 private:
-    //конвертирует обычный ip адрес в бинарную строку
-    QString convertIpBinary(QString);
-    //преобразование заданной строки в бинарную, и подгонка её к нужному размеру
-    QString convertToBinary(QString, int);
-    //преобразование бинарной строки в обычный ip адрес
-    QString convertIpDex(QString);
-    //преобразование бинарной строки в обычную
-    QString convertToDex(QString s);
+    QString convertIpBinary( QString ); //конвертирует обычный ip адрес в бинарную строку
+
+    QString convertToBinary( QString, int ); //преобразование заданной строки в бинарную, и подгонка её к нужному размеру
+
+    QString convertIpDex( QString ); //преобразование бинарной строки в обычный ip адрес
+
+    QString convertToDex( QString ); //преобразование бинарной строки в обычную
 };
 
 #endif // CONVERTER_H

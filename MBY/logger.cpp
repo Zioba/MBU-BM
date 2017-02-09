@@ -1,38 +1,34 @@
 #include "logger.h"
 
-Logger::Logger(QSqlDatabase db)
+Logger::Logger( QSqlDatabase db )
 {
-    this->db=db;
+    this->db = db;
 }
 
-//2)тип_сообщения, 3)дата, 4)отправитель/получатель, 5)пакет, 6)состояние обработки
-int Logger::makeNote(int type, QString date, int x, QString package, int status)
+bool Logger::makeNote( int type, QString date, int x, QString package, int status )
 {
-    QSqlQuery query= QSqlQuery(db);
-    QString s="";
-    s=s+"SELECT * FROM log.log_table_message ORDER BY id_note DESC LIMIT 1;";
-    if (!query.exec(s)) {
-        return 2;
+    QSqlQuery query = QSqlQuery( db );
+    QString s;
+    s = "SELECT id_note FROM log.log_table_message ORDER BY id_note DESC LIMIT 1;";
+    if ( !query.exec( s ) ) {
+        return false;
     }
     else {
         int id;
-        while (query.next()) {
-            id=query.value(0).toInt();
+        while ( query.next() ) {
+            id = query.value( 0 ).toInt();
         }
-        s="";
         id++;
-        QSqlQuery query2= QSqlQuery(db);
-        s=s+"INSERT INTO log.log_table_message VALUES ('"+QString::number(id)+"','"
-                                                         +QString::number(type)+"','"
-                                                         +date+"','"
-                                                         +QString::number(x)+"','"
-                                                         +package+"','"
-                                                         +QString::number(status)+"');";
-        if (!query2.exec(s)) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
+        db.transaction();
+        query.prepare( "INSERT INTO log.log_table_message(id_note, type_message, date, reciver_sender, package, status)"
+                                      "VALUES (?, ?, ?, ?, ?, ?)" );
+        query.addBindValue( id );
+        query.addBindValue( type );
+        query.addBindValue( date );
+        query.addBindValue( x );
+        query.addBindValue( package );
+        query.addBindValue( status );
+        query.exec();
+        return db.commit();
     }
 }

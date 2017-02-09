@@ -27,31 +27,41 @@ public:
     ~MainWindow();
 
 private slots:
-    //занесение в лог действия
-    void makeLogNote(QString);
-    //чтение датаграммы
+    void makeLogNote( QString );
+
     void readDatagram();
-    //установка Ip адреса
+
     void setIp();
+
     void on_exitButton_clicked();
+
     void on_updBut_clicked();
+
     void on_clearBut_clicked();
+
     void on_combObjTableBut_clicked();
+
     void on_logTableBut_3_clicked();
-    //обработка принятого сообщения
-    void parsingMessage(QString);
+
+    void parsingMessage( QString );
+
+    QString getCurrentDateAndTime();
+
+    QString assistParser( QString, int & );
 
 private:
     Ui::MainWindow *ui;
-    QUdpSocket udpSocket;
-    QTimer timer;
-    QSqlDatabase db;
+
+    QUdpSocket     udpSocket;
+    QSqlDatabase   db;
     QSqlTableModel *model;
+
     QHostAddress myIp;
     QHostAddress targetIp;
-    QString targetPort;
-    QString myPort;
-    Logger *logger;
+    QString      myPort;
+    QString      targetPort;
+
+    Logger    *logger;
     Converter *converter;
 };
 

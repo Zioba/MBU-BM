@@ -12,9 +12,11 @@ class IpDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit IpDialog(QWidget *parent = 0);
-    ~IpDialog();
+    explicit IpDialog( QWidget *parent = 0 );
+
     QString value();
+
+    ~IpDialog();
 
 private:
     Ui::IpDialog *ui;

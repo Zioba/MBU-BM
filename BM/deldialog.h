@@ -12,10 +12,11 @@ class DelDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit DelDialog(QWidget *parent = 0);
-    ~DelDialog();
+    explicit DelDialog( QWidget *parent = 0 );
 
     QString value();
+
+    ~DelDialog();
 
 private:
     Ui::DelDialog *ui;
