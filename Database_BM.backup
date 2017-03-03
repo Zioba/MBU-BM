@@ -5,7 +5,7 @@
 -- Dumped from database version 9.6.1
 -- Dumped by pg_dump version 9.6.1
 
--- Started on 2017-02-02 07:55:44
+-- Started on 2017-03-03 15:33:46
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -17,7 +17,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 3677 (class 1262 OID 20451)
+-- TOC entry 3678 (class 1262 OID 20451)
 -- Name: Database_BM; Type: DATABASE; Schema: -; Owner: postgres
 --
 
@@ -38,7 +38,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 8 (class 2615 OID 20452)
+-- TOC entry 9 (class 2615 OID 20452)
 -- Name: log; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -48,7 +48,7 @@ CREATE SCHEMA log;
 ALTER SCHEMA log OWNER TO postgres;
 
 --
--- TOC entry 6 (class 2615 OID 20483)
+-- TOC entry 7 (class 2615 OID 20483)
 -- Name: own_forces; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -56,6 +56,16 @@ CREATE SCHEMA own_forces;
 
 
 ALTER SCHEMA own_forces OWNER TO postgres;
+
+--
+-- TOC entry 6 (class 2615 OID 22156)
+-- Name: reference_data; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA reference_data;
+
+
+ALTER SCHEMA reference_data OWNER TO postgres;
 
 --
 -- TOC entry 1 (class 3079 OID 12387)
@@ -66,7 +76,7 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- TOC entry 3679 (class 0 OID 0)
+-- TOC entry 3680 (class 0 OID 0)
 -- Dependencies: 1
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
@@ -83,7 +93,7 @@ CREATE EXTENSION IF NOT EXISTS ltree WITH SCHEMA public;
 
 
 --
--- TOC entry 3680 (class 0 OID 0)
+-- TOC entry 3681 (class 0 OID 0)
 -- Dependencies: 3
 -- Name: EXTENSION ltree; Type: COMMENT; Schema: -; Owner: 
 --
@@ -100,7 +110,7 @@ CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 
 
 --
--- TOC entry 3681 (class 0 OID 0)
+-- TOC entry 3682 (class 0 OID 0)
 -- Dependencies: 2
 -- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: 
 --
@@ -115,7 +125,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- TOC entry 187 (class 1259 OID 20453)
+-- TOC entry 188 (class 1259 OID 20453)
 -- Name: log_table_message; Type: TABLE; Schema: log; Owner: postgres
 --
 
@@ -131,10 +141,64 @@ CREATE TABLE log_table_message (
 
 ALTER TABLE log_table_message OWNER TO postgres;
 
+--
+-- TOC entry 3683 (class 0 OID 0)
+-- Dependencies: 188
+-- Name: COLUMN log_table_message.id_note; Type: COMMENT; Schema: log; Owner: postgres
+--
+
+COMMENT ON COLUMN log_table_message.id_note IS 'id записи';
+
+
+--
+-- TOC entry 3684 (class 0 OID 0)
+-- Dependencies: 188
+-- Name: COLUMN log_table_message.type_message; Type: COMMENT; Schema: log; Owner: postgres
+--
+
+COMMENT ON COLUMN log_table_message.type_message IS 'тип сообщения';
+
+
+--
+-- TOC entry 3685 (class 0 OID 0)
+-- Dependencies: 188
+-- Name: COLUMN log_table_message.date; Type: COMMENT; Schema: log; Owner: postgres
+--
+
+COMMENT ON COLUMN log_table_message.date IS 'дата';
+
+
+--
+-- TOC entry 3686 (class 0 OID 0)
+-- Dependencies: 188
+-- Name: COLUMN log_table_message.reciver_sender; Type: COMMENT; Schema: log; Owner: postgres
+--
+
+COMMENT ON COLUMN log_table_message.reciver_sender IS 'отправитель/получатель';
+
+
+--
+-- TOC entry 3687 (class 0 OID 0)
+-- Dependencies: 188
+-- Name: COLUMN log_table_message.package; Type: COMMENT; Schema: log; Owner: postgres
+--
+
+COMMENT ON COLUMN log_table_message.package IS 'пакет';
+
+
+--
+-- TOC entry 3688 (class 0 OID 0)
+-- Dependencies: 188
+-- Name: COLUMN log_table_message.status; Type: COMMENT; Schema: log; Owner: postgres
+--
+
+COMMENT ON COLUMN log_table_message.status IS 'состояние обработки';
+
+
 SET search_path = own_forces, pg_catalog;
 
 --
--- TOC entry 206 (class 1259 OID 22148)
+-- TOC entry 205 (class 1259 OID 22148)
 -- Name: combatobject_location; Type: TABLE; Schema: own_forces; Owner: postgres
 --
 
@@ -153,7 +217,79 @@ CREATE TABLE combatobject_location (
 ALTER TABLE combatobject_location OWNER TO postgres;
 
 --
--- TOC entry 190 (class 1259 OID 20659)
+-- TOC entry 3689 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: COLUMN combatobject_location.combat_hierarchy; Type: COMMENT; Schema: own_forces; Owner: postgres
+--
+
+COMMENT ON COLUMN combatobject_location.combat_hierarchy IS 'Идентификатор объекта управления';
+
+
+--
+-- TOC entry 3690 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: COLUMN combatobject_location.obj_location; Type: COMMENT; Schema: own_forces; Owner: postgres
+--
+
+COMMENT ON COLUMN combatobject_location.obj_location IS 'Координаты';
+
+
+--
+-- TOC entry 3691 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: COLUMN combatobject_location.direction; Type: COMMENT; Schema: own_forces; Owner: postgres
+--
+
+COMMENT ON COLUMN combatobject_location.direction IS 'Направление';
+
+
+--
+-- TOC entry 3692 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: COLUMN combatobject_location.tid; Type: COMMENT; Schema: own_forces; Owner: postgres
+--
+
+COMMENT ON COLUMN combatobject_location.tid IS 'Идентификатор транзакции';
+
+
+--
+-- TOC entry 3693 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: COLUMN combatobject_location.date_add; Type: COMMENT; Schema: own_forces; Owner: postgres
+--
+
+COMMENT ON COLUMN combatobject_location.date_add IS 'Время создание данных';
+
+
+--
+-- TOC entry 3694 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: COLUMN combatobject_location.date_edit; Type: COMMENT; Schema: own_forces; Owner: postgres
+--
+
+COMMENT ON COLUMN combatobject_location.date_edit IS 'Время изменения данных';
+
+
+--
+-- TOC entry 3695 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: COLUMN combatobject_location.date_delete; Type: COMMENT; Schema: own_forces; Owner: postgres
+--
+
+COMMENT ON COLUMN combatobject_location.date_delete IS 'Время удаления данных';
+
+
+--
+-- TOC entry 3696 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: COLUMN combatobject_location.id_manager; Type: COMMENT; Schema: own_forces; Owner: postgres
+--
+
+COMMENT ON COLUMN combatobject_location.id_manager IS 'Пользователь, изменивший данные';
+
+
+--
+-- TOC entry 189 (class 1259 OID 20659)
 -- Name: combatstructure; Type: TABLE; Schema: own_forces; Owner: postgres
 --
 
@@ -174,8 +310,8 @@ CREATE TABLE combatstructure (
 ALTER TABLE combatstructure OWNER TO postgres;
 
 --
--- TOC entry 3682 (class 0 OID 0)
--- Dependencies: 190
+-- TOC entry 3697 (class 0 OID 0)
+-- Dependencies: 189
 -- Name: COLUMN combatstructure.combat_hierarchy; Type: COMMENT; Schema: own_forces; Owner: postgres
 --
 
@@ -183,8 +319,8 @@ COMMENT ON COLUMN combatstructure.combat_hierarchy IS 'Иерархия';
 
 
 --
--- TOC entry 3683 (class 0 OID 0)
--- Dependencies: 190
+-- TOC entry 3698 (class 0 OID 0)
+-- Dependencies: 189
 -- Name: COLUMN combatstructure.object_name; Type: COMMENT; Schema: own_forces; Owner: postgres
 --
 
@@ -192,8 +328,8 @@ COMMENT ON COLUMN combatstructure.object_name IS 'Войсковые форми�
 
 
 --
--- TOC entry 3684 (class 0 OID 0)
--- Dependencies: 190
+-- TOC entry 3699 (class 0 OID 0)
+-- Dependencies: 189
 -- Name: COLUMN combatstructure.object_number; Type: COMMENT; Schema: own_forces; Owner: postgres
 --
 
@@ -201,8 +337,8 @@ COMMENT ON COLUMN combatstructure.object_number IS 'Номер';
 
 
 --
--- TOC entry 3685 (class 0 OID 0)
--- Dependencies: 190
+-- TOC entry 3700 (class 0 OID 0)
+-- Dependencies: 189
 -- Name: COLUMN combatstructure.type_army; Type: COMMENT; Schema: own_forces; Owner: postgres
 --
 
@@ -210,8 +346,8 @@ COMMENT ON COLUMN combatstructure.type_army IS 'Род войск (ид_клас
 
 
 --
--- TOC entry 3686 (class 0 OID 0)
--- Dependencies: 190
+-- TOC entry 3701 (class 0 OID 0)
+-- Dependencies: 189
 -- Name: COLUMN combatstructure.type_mode; Type: COMMENT; Schema: own_forces; Owner: postgres
 --
 
@@ -219,8 +355,8 @@ COMMENT ON COLUMN combatstructure.type_mode IS 'Режим работы (бое�
 
 
 --
--- TOC entry 3687 (class 0 OID 0)
--- Dependencies: 190
+-- TOC entry 3702 (class 0 OID 0)
+-- Dependencies: 189
 -- Name: COLUMN combatstructure.type_record; Type: COMMENT; Schema: own_forces; Owner: postgres
 --
 
@@ -228,8 +364,8 @@ COMMENT ON COLUMN combatstructure.type_record IS 'Тип записи (1-соз�
 
 
 --
--- TOC entry 3688 (class 0 OID 0)
--- Dependencies: 190
+-- TOC entry 3703 (class 0 OID 0)
+-- Dependencies: 189
 -- Name: COLUMN combatstructure.date_add; Type: COMMENT; Schema: own_forces; Owner: postgres
 --
 
@@ -237,8 +373,8 @@ COMMENT ON COLUMN combatstructure.date_add IS 'Время создания за�
 
 
 --
--- TOC entry 3689 (class 0 OID 0)
--- Dependencies: 190
+-- TOC entry 3704 (class 0 OID 0)
+-- Dependencies: 189
 -- Name: COLUMN combatstructure.date_edit; Type: COMMENT; Schema: own_forces; Owner: postgres
 --
 
@@ -246,19 +382,19 @@ COMMENT ON COLUMN combatstructure.date_edit IS 'Время редактиров�
 
 
 --
--- TOC entry 3690 (class 0 OID 0)
--- Dependencies: 190
+-- TOC entry 3705 (class 0 OID 0)
+-- Dependencies: 189
 -- Name: COLUMN combatstructure.date_delete; Type: COMMENT; Schema: own_forces; Owner: postgres
 --
 
 COMMENT ON COLUMN combatstructure.date_delete IS 'Время удаления записи';
 
 
-SET search_path = public, pg_catalog;
+SET search_path = reference_data, pg_catalog;
 
 --
--- TOC entry 189 (class 1259 OID 20474)
--- Name: manager; Type: TABLE; Schema: public; Owner: postgres
+-- TOC entry 207 (class 1259 OID 22159)
+-- Name: manager; Type: TABLE; Schema: reference_data; Owner: postgres
 --
 
 CREATE TABLE manager (
@@ -274,62 +410,62 @@ CREATE TABLE manager (
 ALTER TABLE manager OWNER TO postgres;
 
 --
--- TOC entry 3691 (class 0 OID 0)
--- Dependencies: 189
--- Name: COLUMN manager.id_manager; Type: COMMENT; Schema: public; Owner: postgres
+-- TOC entry 3706 (class 0 OID 0)
+-- Dependencies: 207
+-- Name: COLUMN manager.id_manager; Type: COMMENT; Schema: reference_data; Owner: postgres
 --
 
 COMMENT ON COLUMN manager.id_manager IS 'индификатор пользователя';
 
 
 --
--- TOC entry 3692 (class 0 OID 0)
--- Dependencies: 189
--- Name: COLUMN manager.manager_name; Type: COMMENT; Schema: public; Owner: postgres
+-- TOC entry 3707 (class 0 OID 0)
+-- Dependencies: 207
+-- Name: COLUMN manager.manager_name; Type: COMMENT; Schema: reference_data; Owner: postgres
 --
 
 COMMENT ON COLUMN manager.manager_name IS 'логин пользователя';
 
 
 --
--- TOC entry 3693 (class 0 OID 0)
--- Dependencies: 189
--- Name: COLUMN manager.password_manager; Type: COMMENT; Schema: public; Owner: postgres
+-- TOC entry 3708 (class 0 OID 0)
+-- Dependencies: 207
+-- Name: COLUMN manager.password_manager; Type: COMMENT; Schema: reference_data; Owner: postgres
 --
 
 COMMENT ON COLUMN manager.password_manager IS 'пароль';
 
 
 --
--- TOC entry 3694 (class 0 OID 0)
--- Dependencies: 189
--- Name: COLUMN manager.tasks; Type: COMMENT; Schema: public; Owner: postgres
+-- TOC entry 3709 (class 0 OID 0)
+-- Dependencies: 207
+-- Name: COLUMN manager.tasks; Type: COMMENT; Schema: reference_data; Owner: postgres
 --
 
 COMMENT ON COLUMN manager.tasks IS 'права';
 
 
 --
--- TOC entry 3695 (class 0 OID 0)
--- Dependencies: 189
--- Name: COLUMN manager.data_creation; Type: COMMENT; Schema: public; Owner: postgres
+-- TOC entry 3710 (class 0 OID 0)
+-- Dependencies: 207
+-- Name: COLUMN manager.data_creation; Type: COMMENT; Schema: reference_data; Owner: postgres
 --
 
 COMMENT ON COLUMN manager.data_creation IS 'Время создания';
 
 
 --
--- TOC entry 3696 (class 0 OID 0)
--- Dependencies: 189
--- Name: COLUMN manager.date_delete; Type: COMMENT; Schema: public; Owner: postgres
+-- TOC entry 3711 (class 0 OID 0)
+-- Dependencies: 207
+-- Name: COLUMN manager.date_delete; Type: COMMENT; Schema: reference_data; Owner: postgres
 --
 
 COMMENT ON COLUMN manager.date_delete IS 'Время удаления';
 
 
 --
--- TOC entry 188 (class 1259 OID 20472)
--- Name: manager_id_manager_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- TOC entry 206 (class 1259 OID 22157)
+-- Name: manager_id_manager_seq; Type: SEQUENCE; Schema: reference_data; Owner: postgres
 --
 
 CREATE SEQUENCE manager_id_manager_seq
@@ -343,17 +479,17 @@ CREATE SEQUENCE manager_id_manager_seq
 ALTER TABLE manager_id_manager_seq OWNER TO postgres;
 
 --
--- TOC entry 3697 (class 0 OID 0)
--- Dependencies: 188
--- Name: manager_id_manager_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- TOC entry 3712 (class 0 OID 0)
+-- Dependencies: 206
+-- Name: manager_id_manager_seq; Type: SEQUENCE OWNED BY; Schema: reference_data; Owner: postgres
 --
 
 ALTER SEQUENCE manager_id_manager_seq OWNED BY manager.id_manager;
 
 
 --
--- TOC entry 3534 (class 2604 OID 20477)
--- Name: manager id_manager; Type: DEFAULT; Schema: public; Owner: postgres
+-- TOC entry 3536 (class 2604 OID 22162)
+-- Name: manager id_manager; Type: DEFAULT; Schema: reference_data; Owner: postgres
 --
 
 ALTER TABLE ONLY manager ALTER COLUMN id_manager SET DEFAULT nextval('manager_id_manager_seq'::regclass);
@@ -362,43 +498,37 @@ ALTER TABLE ONLY manager ALTER COLUMN id_manager SET DEFAULT nextval('manager_id
 SET search_path = log, pg_catalog;
 
 --
--- TOC entry 3668 (class 0 OID 20453)
--- Dependencies: 187
+-- TOC entry 3669 (class 0 OID 20453)
+-- Dependencies: 188
 -- Data for Name: log_table_message; Type: TABLE DATA; Schema: log; Owner: postgres
 --
 
 COPY log_table_message (id_note, type_message, date, reciver_sender, package, status) FROM stdin;
 1	1	201719-01-27 00:15:24.633+03	1	Hello World	1
-2	1	201702-02-02 00:37:55.888+03	1	0053.10000mbu0CC1=1;2;3;45;\r	2
-3	1	201702-02-02 00:49:45.465+03	1	0053.10000mbu0CC1=1;2;3;45;\r	2
-4	1	201702-02-02 00:50:36.14+03	1	0053.10000mbu0CC1=1;2;3;45;\r	2
-5	1	201703-02-02 00:01:01.146+03	1	0053.10000mbu0CC1=1;2;3;45;\r	2
-6	1	201703-02-02 00:02:51.947+03	1	0053.10000mbu0CC1=1;2;3;45;\r	2
-7	1	201704-02-02 00:26:03.834+03	1	0053.10000mbu0CC1=1;2;3;45;\r	2
-8	1	201705-02-02 00:14:30.196+03	1	0053.10000mbu0CC1=1;2;3;45;\r	2
-9	1	201705-02-02 00:20:24.943+03	1	0053.10000mbu0CC1=1;2;3;45;\r	2
-10	1	201705-02-02 00:21:51.753+03	1	0053.10000mbu0CC1=1;2;3;45;\r	2
-11	1	201705-02-02 00:34:24.44+03	1	0053.10000mbu0CC1=1;2;3;45;\r	2
-12	1	201705-02-02 00:47:04.578+03	1	0053.10000mbu0CC1=1;2;3;45;\r	2
+2	1	201714-03-03 00:14:35.61+03	1	0053.10000mbu0CC1=1;2;3;90;\r	2
+3	1	201714-03-03 00:19:34.911+03	1	0053.10000mbu0CC1=1;2;3;90;\r	2
+4	1	2017-03-03 14:28:08.747+03	1	0053.10000mbu0CC1=1;2;3;90;\r	2
+5	1	2017-03-03 14:41:17.528+03	1	0053.10000mbu0CC1=1;2;3;90;\r	2
+6	1	2017-03-03 14:42:28.388+03	1	0053.10000mbu0CC1=1;2;3;90;\r	2
 \.
 
 
 SET search_path = own_forces, pg_catalog;
 
 --
--- TOC entry 3672 (class 0 OID 22148)
--- Dependencies: 206
+-- TOC entry 3671 (class 0 OID 22148)
+-- Dependencies: 205
 -- Data for Name: combatobject_location; Type: TABLE DATA; Schema: own_forces; Owner: postgres
 --
 
 COPY combatobject_location (combat_hierarchy, obj_location, direction, tid, date_add, date_edit, date_delete, id_manager) FROM stdin;
-53.10	0101000080000000000000F03F00000000000000400000000000000840	45	1	2017-01-17 14:19:18.095+03	2017-01-17 14:19:18.095+03	2017-01-17 14:19:18.095+03	1
+53.10	0101000080000000000000F03F00000000000000400000000000000840	90	1	2017-01-17 14:19:18.095+03	2017-01-17 14:19:18.095+03	2017-01-17 14:19:18.095+03	1
 \.
 
 
 --
--- TOC entry 3671 (class 0 OID 20659)
--- Dependencies: 190
+-- TOC entry 3670 (class 0 OID 20659)
+-- Dependencies: 189
 -- Data for Name: combatstructure; Type: TABLE DATA; Schema: own_forces; Owner: postgres
 --
 
@@ -410,30 +540,8 @@ COPY combatstructure (combat_hierarchy, object_name, object_number, type_army, t
 SET search_path = public, pg_catalog;
 
 --
--- TOC entry 3670 (class 0 OID 20474)
--- Dependencies: 189
--- Data for Name: manager; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY manager (id_manager, manager_name, password_manager, tasks, data_creation, date_delete) FROM stdin;
-1	combat	12345	1	2017-01-23 13:59:48.473225+03	\N
-2	iiivanov	11111	2	2017-01-23 13:59:48.473225+03	\N
-3	absmirnov	22222	2	2017-01-23 13:59:48.473225+03	\N
-\.
-
-
---
--- TOC entry 3698 (class 0 OID 0)
--- Dependencies: 188
--- Name: manager_id_manager_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('manager_id_manager_seq', 3, true);
-
-
---
--- TOC entry 3533 (class 0 OID 20964)
--- Dependencies: 192
+-- TOC entry 3534 (class 0 OID 20964)
+-- Dependencies: 191
 -- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -441,10 +549,34 @@ COPY spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) FROM stdin;
 \.
 
 
+SET search_path = reference_data, pg_catalog;
+
+--
+-- TOC entry 3673 (class 0 OID 22159)
+-- Dependencies: 207
+-- Data for Name: manager; Type: TABLE DATA; Schema: reference_data; Owner: postgres
+--
+
+COPY manager (id_manager, manager_name, password_manager, tasks, data_creation, date_delete) FROM stdin;
+1	combat	12345	1	2017-02-06 03:20:35.849141+03	\N
+2	iiivanov	11111	2	2017-02-06 03:20:35.849141+03	\N
+3	absmirnov	22222	2	2017-02-06 03:20:35.849141+03	\N
+\.
+
+
+--
+-- TOC entry 3713 (class 0 OID 0)
+-- Dependencies: 206
+-- Name: manager_id_manager_seq; Type: SEQUENCE SET; Schema: reference_data; Owner: postgres
+--
+
+SELECT pg_catalog.setval('manager_id_manager_seq', 3, true);
+
+
 SET search_path = log, pg_catalog;
 
 --
--- TOC entry 3537 (class 2606 OID 20460)
+-- TOC entry 3538 (class 2606 OID 20460)
 -- Name: log_table_message log_table_message_pkey; Type: CONSTRAINT; Schema: log; Owner: postgres
 --
 
@@ -455,7 +587,7 @@ ALTER TABLE ONLY log_table_message
 SET search_path = own_forces, pg_catalog;
 
 --
--- TOC entry 3543 (class 2606 OID 22155)
+-- TOC entry 3542 (class 2606 OID 22155)
 -- Name: combatobject_location combatobject_location_pkey; Type: CONSTRAINT; Schema: own_forces; Owner: postgres
 --
 
@@ -464,7 +596,7 @@ ALTER TABLE ONLY combatobject_location
 
 
 --
--- TOC entry 3541 (class 2606 OID 20666)
+-- TOC entry 3540 (class 2606 OID 20666)
 -- Name: combatstructure combatstructure_pk; Type: CONSTRAINT; Schema: own_forces; Owner: postgres
 --
 
@@ -472,18 +604,18 @@ ALTER TABLE ONLY combatstructure
     ADD CONSTRAINT combatstructure_pk PRIMARY KEY (combat_hierarchy);
 
 
-SET search_path = public, pg_catalog;
+SET search_path = reference_data, pg_catalog;
 
 --
--- TOC entry 3539 (class 2606 OID 20482)
--- Name: manager manager_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3544 (class 2606 OID 22167)
+-- Name: manager manager_pk; Type: CONSTRAINT; Schema: reference_data; Owner: postgres
 --
 
 ALTER TABLE ONLY manager
     ADD CONSTRAINT manager_pk PRIMARY KEY (id_manager);
 
 
--- Completed on 2017-02-02 07:55:51
+-- Completed on 2017-03-03 15:33:53
 
 --
 -- PostgreSQL database dump complete

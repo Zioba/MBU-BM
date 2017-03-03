@@ -7,10 +7,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    QPoint pos( X_POSITION_FRAME, Y_POSITION_FRAME );
+    this->move( pos );
     ui->setupUi( this );
     setWindowTitle( "BM" );
-    QPoint pos( 0, 1 );
-    this->move( pos );
+
     db=QSqlDatabase::addDatabase( "QPSQL" );
     db.setHostName( "127.0.0.1" );
     db.setPort( 5432 );
@@ -23,16 +24,14 @@ MainWindow::MainWindow(QWidget *parent) :
     else {
         makeLogNote( "Start working" );
     }
+
     model = new QSqlTableModel( this, db );
+    udpSocket.bind( LISTERNING_PORT );
     on_combObjTableBut_clicked();
-    setIp();
     logger = new Logger(db);
     converter = new Converter();
-    myIp.setAddress( "127.0.0.1" );
-    //targetIp.setAddress( "127.0.0.1" );
-    myPort = "5825";
-    targetPort = "5824";
-    udpSocket.bind( 5825 );
+    setTargetIp();
+    setMyIp();
     connect( &udpSocket, SIGNAL( readyRead() ), this, SLOT( readDatagram() ) );
 }
 
@@ -45,7 +44,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::makeLogNote(QString s)
 {
-    ui->logField->append( tr( "%1 %2" ).arg( QTime::currentTime().toString( "hh:mm:ss" ) ).arg( s ) );
+    ui->logField->append( tr( "%1 %2 %3" ).arg( QDate::currentDate().toString( "dd.MM.yyyy" ) )
+                                          .arg( QTime::currentTime().toString( "hh:mm:ss" ) )
+                                          .arg( s ) );
 }
 
 void MainWindow::on_exitButton_clicked()
@@ -56,7 +57,7 @@ void MainWindow::on_exitButton_clicked()
 void MainWindow::on_updBut_clicked()
 {
     model->select();
-    ui->logField->append( tr( "%1 table update" ).arg( QTime::currentTime().toString( "hh:mm:ss" ) ) );
+    ui->logField->append( tr( "%1 таблица обновлена" ).arg( QTime::currentTime().toString( "hh:mm:ss" ) ) );
 }
 
 void MainWindow::on_clearBut_clicked()
@@ -71,14 +72,11 @@ void MainWindow::on_itemSendCoord_triggered()
     if ( dia.exec() ) {
         trash = dia.value();
     }
-    //trash = "53.10";
-    int number = 0;
-    QString data = makeDatagram( trash, &number );
+    QString data = makeDatagram( trash );
     if ( data == "error" ) {
         makeLogNote( "FAIL" );
         return;
     }
-    qDebug() << "number=" << number;
     QStringList list;
     list << myIp.toString()
          << targetIp.toString()
@@ -89,10 +87,11 @@ void MainWindow::on_itemSendCoord_triggered()
          << QString::number( data.length() )
          << ""
          << "0001"
-         << QString::number( 5 )
+         << QString::number( unicumMessageId )
          << "1"
          << "1"
          << data;
+    unicumMessageId++;
     QByteArray datagram = converter->encode( list );
     qDebug() << targetPort.toLong( Q_NULLPTR, 10 );
     udpSocket.writeDatagram( datagram, targetIp, targetPort.toLong( Q_NULLPTR, 10) );
@@ -106,7 +105,7 @@ void MainWindow::on_itemSendCoord_triggered()
     }
 }
 
-QString MainWindow::makeDatagram( QString q, int *number )
+QString MainWindow::makeDatagram( QString q )
 {
     QString answer = "";
     answer.append( "0" );                        //метод сжатия
@@ -125,7 +124,6 @@ QString MainWindow::makeDatagram( QString q, int *number )
     else {
         if ( query.size() == 0 ) return "error";
         while ( query.next() ) {
-            //*number=query.value(0).toInt();
             answer.append( query.value( 0 ).toString() );
             answer.append( ";" );
             answer.append( query.value( 1 ).toString() );
@@ -137,27 +135,34 @@ QString MainWindow::makeDatagram( QString q, int *number )
         }
     }
     answer.append( "\r" );
-    //qDebug() << answer;
     return answer;
 }
 
-void MainWindow::setIp() {
+void MainWindow::setTargetIp() {
     IpDialog dia;
     if ( dia.exec() ) {
         targetIp = dia.value();
     }
 }
 
+void MainWindow::setMyIp() {
+    IpDialog dia;
+    dia.changeTitle();
+    if ( dia.exec() ) {
+        myIp = dia.value();
+    }
+}
+
 void MainWindow::readDatagram()
 {
-    makeLogNote( "получена датаграмма квитанция" );
     QByteArray datagram;
     datagram.resize( udpSocket.pendingDatagramSize() );
     udpSocket.readDatagram( datagram.data(), datagram.size() );
     QStringList list=converter->decode( datagram );
     bool x=logger->makeNote( 1, getCurrentDateAndTime(), 1, list.at( 12 ), 3 );
     if ( x ) {
-        makeLogNote( "получена датаграмма" );
+        makeLogNote( "получена датаграмма квитанция" );
+
     }
         else {
         makeLogNote( "FAIL1" );
@@ -169,7 +174,11 @@ void MainWindow::on_combObjTableBut_clicked()
     model->setTable( "own_forces.combatobject_location" );
     ui->tableView->setModel( model );
     model->select();
+    for ( int i = 0; i < model->columnCount(); i++ ) {
+        ui->tableView->horizontalHeader()->setSectionResizeMode( i , QHeaderView::ResizeToContents);
+    }
     makeLogNote( "Загружены данные combat objects" );
+    setRussianColomnIDs("combatobject_location");
 }
 
 void MainWindow::on_logTableBut_3_clicked()
@@ -178,9 +187,41 @@ void MainWindow::on_logTableBut_3_clicked()
     ui->tableView->setModel( model );
     model->select();
     makeLogNote( "Загружены данные log table" );
+    for ( int i = 0; i < model->columnCount(); i++ ) {
+        ui->tableView->horizontalHeader()->setSectionResizeMode( i , QHeaderView::ResizeToContents);
+    }
+    setRussianColomnIDs("log_table_message");
 }
 
 QString MainWindow::getCurrentDateAndTime()
 {
-    return QDate::currentDate().toString( "dd.MM.yyyy" ) + QTime::currentTime().toString( "hh:mm:ss.zzz" );
+    return QDate::currentDate().toString( "dd.MM.yyyy" ) + " " + QTime::currentTime().toString( "hh:mm:ss.zzz" );
+}
+
+void MainWindow::setRussianColomnIDs(QString tableName) {
+    QSqlQuery query = QSqlQuery( db );
+    query.prepare( "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '"+tableName+"';" );
+    query.exec();
+    if ( query.next() ){
+        for ( int i = 0; i < query.size(); i++) {
+            QSqlRecord rec;
+            rec = query.record();
+            QSqlQuery query2 = QSqlQuery( db );
+            QString s = "SELECT description FROM pg_description INNER JOIN ";
+            query2.prepare( s +
+                            "(SELECT oid FROM pg_class WHERE relname ='" +
+                            tableName +
+                            "') as table_oid " +
+                            "ON pg_description.objoid = table_oid.oid " +
+                            "AND pg_description.objsubid IN " +
+                            "(SELECT attnum FROM pg_attribute WHERE attname = '" +
+                            query.value(0).toString() +
+                            "' AND pg_attribute.attrelid = table_oid.oid );" );
+            query2.exec();
+            if (query2.next()) {
+                model->setHeaderData(i, Qt::Horizontal, query2.value(0).toString());
+            }
+            query.next();
+        }
+    }
 }

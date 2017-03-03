@@ -33,7 +33,7 @@
       <item>
        <widget class="QPushButton" name="exitButton">
         <property name="text">
-         <string>Exit</string>
+         <string>выход</string>
         </property>
        </widget>
       </item>
@@ -51,14 +51,14 @@
           <item>
            <widget class="QPushButton" name="combObjTableBut">
             <property name="text">
-             <string>combat objects table</string>
+             <string>таблица объектов</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="logTableBut_3">
             <property name="text">
-             <string>log table</string>
+             <string>таблица событий</string>
             </property>
            </widget>
           </item>
@@ -82,14 +82,14 @@
           <item>
            <widget class="QPushButton" name="updBut">
             <property name="text">
-             <string>update information</string>
+             <string>обновить информацию</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="clearBut">
             <property name="text">
-             <string>clear log</string>
+             <string>очистить историю</string>
             </property>
            </widget>
           </item>

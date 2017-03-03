@@ -28,28 +28,29 @@ public:
 
 private slots:
     void makeLogNote( QString );
-
     void readDatagram();
-
     void setIp();
-
     void on_exitButton_clicked();
-
     void on_updBut_clicked();
-
     void on_clearBut_clicked();
-
     void on_combObjTableBut_clicked();
-
     void on_logTableBut_3_clicked();
-
     void parsingMessage( QString );
 
     QString getCurrentDateAndTime();
-
     QString assistParser( QString, int & );
+    void setRussianColomnIDs( QString );
 
 private:
+    const int X_POSITION_FRAME=900;
+    const int Y_POSITION_FRAME=0;
+    const int LISTERNING_PORT=5824;
+    const int DB_PORT=5432;
+    int unicumMessageId = 1;
+
+    const QString myPort = "5824";
+    const QString targetPort = "5825";
+
     Ui::MainWindow *ui;
 
     QUdpSocket     udpSocket;
@@ -58,8 +59,6 @@ private:
 
     QHostAddress myIp;
     QHostAddress targetIp;
-    QString      myPort;
-    QString      targetPort;
 
     Logger    *logger;
     Converter *converter;

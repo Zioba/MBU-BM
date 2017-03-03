@@ -16,6 +16,8 @@ public:
 
     QString value();
 
+    void changeTitle();
+
     ~IpDialog();
 
 private:

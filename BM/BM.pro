@@ -17,14 +17,17 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     logger.cpp \
     ipdialog.cpp \
-    converter.cpp
+    converter.cpp \
+    okfailmessagewindow.cpp
 
 HEADERS  += mainwindow.h\
         deldialog.h \
     logger.h \
     ipdialog.h \
-    converter.h
+    converter.h \
+    okfailmessagewindow.h
 
 FORMS    += mainwindow.ui\
         deldialog.ui \
-    ipdialog.ui
+    ipdialog.ui \
+    okfailmessagewindow.ui

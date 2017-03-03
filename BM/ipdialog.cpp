@@ -17,3 +17,8 @@ QString IpDialog::value()
 {
     return ui->codeLine->text();
 }
+
+void IpDialog::changeTitle()
+{
+    ui->label->setText( "Ввести свой IP" );
+}

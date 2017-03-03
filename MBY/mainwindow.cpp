@@ -2,19 +2,19 @@
 #include "ui_mainwindow.h"
 #include "deldialog.h"
 #include "ipdialog.h"
-#include <QNetworkInterface>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    setWindowTitle( "MBU" );
-    QPoint pos( 900, 0 );
+    QPoint pos( X_POSITION_FRAME, Y_POSITION_FRAME );
     this->move( pos );
     ui->setupUi( this );
+    setWindowTitle( "MBU" );
+
     db = QSqlDatabase::addDatabase( "QPSQL" );
     db.setHostName( "127.0.0.1" );
-    db.setPort( 5432 );
+    db.setPort( DB_PORT );
     db.setDatabaseName( "Database_MBU" );
     db.setUserName( "postgres" );
     db.setPassword( "qwerty" );
@@ -24,27 +24,14 @@ MainWindow::MainWindow(QWidget *parent) :
     else {
         makeLogNote( "Start working" );
     }
+
     model = new QSqlTableModel( this, db );
-    udpSocket.bind( 5824 );
+    udpSocket.bind( LISTERNING_PORT );
     on_combObjTableBut_clicked();
     logger = new Logger( db );
     converter = new Converter();
     setIp();
-    //myIp.setAddress( "127.0.0.1" );
-    targetIp.setAddress( "127.0.0.1" );
-    myPort = "5824";
-    targetPort = "5825";
-    connect( &udpSocket, SIGNAL( readyRead() ), this, SLOT( readDatagram() ) );
-    /*QList<QHostAddress> list = QNetworkInterface::allAddresses();
-
-     for(int nIter=0; nIter<list.count(); nIter++)
-
-      {
-          if(!list[nIter].isLoopback())
-              if (list[nIter].protocol() == QAbstractSocket::IPv4Protocol )
-            qDebug() << list[nIter].toString();
-
-      }*/
+    connect( &udpSocket, SIGNAL( readyRead() ), this, SLOT( readDatagram() ));
 }
 
 MainWindow::~MainWindow()
@@ -56,7 +43,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::makeLogNote(QString s)
 {
-    ui->logField->append( tr( "%1 %2" ).arg( QTime::currentTime().toString( "hh:mm:ss" ) ).arg( s ) );
+    ui->logField->append( tr( "%1 %2 %3" ).arg( QDate::currentDate().toString( "dd.MM.yyyy" ) )
+                                          .arg( QTime::currentTime().toString( "hh:mm:ss" ) )
+                                          .arg( s ) );
 }
 
 void MainWindow::readDatagram()
@@ -64,12 +53,9 @@ void MainWindow::readDatagram()
     QByteArray datagram;
     datagram.resize( udpSocket.pendingDatagramSize() );
     udpSocket.readDatagram( datagram.data(), datagram.size() );
-    makeLogNote( "recived datagram" );
     QStringList messageMembersList = converter->decode( datagram );
-    QString message = messageMembersList.at( 12 );
     parsingMessage( messageMembersList.at( 12 ) );
-    bool x = logger->makeNote( 1, getCurrentDateAndTime(), 1, messageMembersList.at( 12 ), 3 );
-    if ( x == true ) {
+    if ( logger->makeNote( 1, getCurrentDateAndTime(), 1, messageMembersList.at( 12 ), 3 ) ) {
         makeLogNote( "получена датаграмма" );
     }
         else {
@@ -85,14 +71,14 @@ void MainWindow::readDatagram()
           << QString::number( messageMembersList.at( 12 ).length() )
           << ""  //доделать чексумму
           << "0010"
-          << QString::number( 5 )
+          << QString::number( unicumMessageId )
           << "1"
           << "1";
+    unicumMessageId++;
     QByteArray datagram2 = converter->generateReceiptResponse( dataMembersList );
     qDebug() << targetPort.toLong( Q_NULLPTR, 10 );
     udpSocket.writeDatagram( datagram2, targetIp, 5825 );
-    x = logger->makeNote( 1, getCurrentDateAndTime(), 1, datagram2, 2 );
-    if ( x == true ) {
+    if ( logger->makeNote( 1, getCurrentDateAndTime(), 1, datagram2, 2 ) ) {
         makeLogNote( "отправлено подтверждение получения" );
     }
         else {
@@ -108,14 +94,7 @@ void MainWindow::on_exitButton_clicked()
 void MainWindow::on_updBut_clicked()
 {
     model->select();
-    ui->logField->append( tr( "%1 table update" ).arg( QTime::currentTime().toString( "hh:mm:ss" ) ) );
-}
-
-void MainWindow::setIp() {
-    IpDialog dia;
-    if ( dia.exec() ) {
-        myIp = dia.value();
-    }
+    ui->logField->append( tr( "%1 таблица обновлена" ).arg( QTime::currentTime().toString( "hh:mm:ss" ) ) );
 }
 
 void MainWindow::on_clearBut_clicked()
@@ -128,7 +107,11 @@ void MainWindow::on_combObjTableBut_clicked()
     model->setTable( "own_forces.combatobject_location" );
     ui->tableView->setModel( model );
     model->select();
+    for ( int i = 0; i < model->columnCount(); i++ ) {
+        ui->tableView->horizontalHeader()->setSectionResizeMode( i , QHeaderView::ResizeToContents);
+    }
     makeLogNote( "Загружены данные combat objects" );
+    setRussianColomnIDs("combatobject_location");
 }
 
 void MainWindow::on_logTableBut_3_clicked()
@@ -137,11 +120,21 @@ void MainWindow::on_logTableBut_3_clicked()
     ui->tableView->setModel( model );
     model->select();
     makeLogNote( "Загружены данные log table" );
+    for ( int i = 0; i < model->columnCount(); i++ ) {
+        ui->tableView->horizontalHeader()->setSectionResizeMode( i , QHeaderView::ResizeToContents);
+    }
+    setRussianColomnIDs("log_table_message");
+}
+
+void MainWindow::setIp() {
+    IpDialog dia;
+    if ( dia.exec() ) {
+        myIp = dia.value();
+    }
 }
 
 void MainWindow::parsingMessage( QString s )
 {
-    qDebug() << s;
     if ( s.at( 0 ) == "1" ) {
         makeLogNote( "oшибка, данные сжаты" );
         //не работаем пока со сжатием данных
@@ -185,26 +178,12 @@ void MainWindow::parsingMessage( QString s )
     y = assistParser( data, i );
     z = assistParser( data, i );
     dir = assistParser( data, i );
-//    QSqlQuery query = QSqlQuery( db );
-//    db.transaction();
-//    query.prepare( "UPDATE own_forces.combatobject_location"
-//                   "SET obj_location=ST_MakePoint(?,?,?), direction=?, date_edit=?"
-//                   "WHERE combat_hierarchy=?;" );
-//    query.addBindValue( x );
-//    query.addBindValue( y );
-//    query.addBindValue( z );
-//    query.addBindValue( dir );
-//    query.addBindValue( getCurrentDateAndTime() );
-//    query.addBindValue( object );
-//    query.exec();
-//    qDebug() << query.lastError();
-//    qDebug() << db.commit();
-    //=====================================================================
     QSqlQuery query = QSqlQuery( db );
     QString queryString;
     queryString = "UPDATE own_forces.combatobject_location SET obj_location=ST_MakePoint ("+x+","+y+","+z+"), direction='"+dir+
             "', date_edit='"+ getCurrentDateAndTime() + "' WHERE combat_hierarchy='"+object+"';";
-    if ( query.exec(queryString) ) {
+    qDebug() << queryString;
+    if ( query.exec( queryString ) ) {
         makeLogNote( "база обновлена" );
     }
     else {
@@ -214,7 +193,7 @@ void MainWindow::parsingMessage( QString s )
 
 QString MainWindow::getCurrentDateAndTime()
 {
-    return QDate::currentDate().toString( "dd.MM.yyyy" ) + QTime::currentTime().toString( "hh:mm:ss.zzz" );
+    return QDate::currentDate().toString( "dd.MM.yyyy" ) + " " + QTime::currentTime().toString( "hh:mm:ss.zzz" );
 }
 
 QString MainWindow::assistParser( QString data, int &counter )
@@ -226,4 +205,32 @@ QString MainWindow::assistParser( QString data, int &counter )
     }
     counter++;
     return answer;
+}
+
+void MainWindow::setRussianColomnIDs(QString tableName) {
+    QSqlQuery query = QSqlQuery( db );
+    query.prepare( "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '"+tableName+"';" );
+    query.exec();
+    if ( query.next() ){
+        for ( int i = 0; i < query.size(); i++) {
+            QSqlRecord rec;
+            rec = query.record();
+            QSqlQuery query2 = QSqlQuery( db );
+            QString s = "SELECT description FROM pg_description INNER JOIN ";
+            query2.prepare( s +
+                            "(SELECT oid FROM pg_class WHERE relname ='" +
+                            tableName +
+                            "') as table_oid " +
+                            "ON pg_description.objoid = table_oid.oid " +
+                            "AND pg_description.objsubid IN " +
+                            "(SELECT attnum FROM pg_attribute WHERE attname = '" +
+                            query.value(0).toString() +
+                            "' AND pg_attribute.attrelid = table_oid.oid );" );
+            query2.exec();
+            if (query2.next()) {
+                model->setHeaderData(i, Qt::Horizontal, query2.value(0).toString());
+            }
+            query.next();
+        }
+    }
 }
