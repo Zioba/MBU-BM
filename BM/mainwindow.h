@@ -35,6 +35,7 @@ private slots:
     void on_updBut_clicked();
     void on_clearBut_clicked();
     void on_itemSendCoord_triggered();
+    void on_itemSendRocket_triggered();
     void setTargetIp();
     void setMyIp();
     void on_combObjTableBut_clicked();
@@ -42,7 +43,8 @@ private slots:
     void setRussianColomnIDs(QString);
 
     QString getCurrentDateAndTime();
-    QString makeDatagram( QString );
+    QString makeDatagramCoord( QString );
+    QString makeDatagramRocket( QString q );
 
 private:
     const int X_POSITION_FRAME=0;

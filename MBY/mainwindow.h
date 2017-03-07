@@ -36,6 +36,8 @@ private slots:
     void on_combObjTableBut_clicked();
     void on_logTableBut_3_clicked();
     void parsingMessage( QString );
+    void parsingCoord ( QString, QString );
+    void parsingRocket( QString, QString );
 
     QString getCurrentDateAndTime();
     QString assistParser( QString, int & );

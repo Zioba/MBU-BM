@@ -119,12 +119,18 @@
      <string>Операции</string>
     </property>
     <addaction name="itemSendCoord"/>
+    <addaction name="itemSendRocket"/>
    </widget>
    <addaction name="operations"/>
   </widget>
   <action name="itemSendCoord">
    <property name="text">
     <string>Отправить данные о местоположении</string>
+   </property>
+  </action>
+  <action name="itemSendRocket">
+   <property name="text">
+    <string>Отправить данные о боекомплекте</string>
    </property>
   </action>
  </widget>

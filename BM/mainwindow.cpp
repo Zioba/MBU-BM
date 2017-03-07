@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include "deldialog.h"
 #include "ipdialog.h"
+#include <QErrorMessage>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     db=QSqlDatabase::addDatabase( "QPSQL" );
     db.setHostName( "127.0.0.1" );
-    db.setPort( 5432 );
+    db.setPort( DB_PORT );
     db.setDatabaseName( "Database_BM" );
     db.setUserName( "postgres" );
     db.setPassword( "qwerty" );
@@ -72,9 +74,10 @@ void MainWindow::on_itemSendCoord_triggered()
     if ( dia.exec() ) {
         trash = dia.value();
     }
-    QString data = makeDatagram( trash );
+    QString data = makeDatagramCoord( trash );
     if ( data == "error" ) {
-        makeLogNote( "FAIL" );
+        makeLogNote( "ошибка создания датаграммы" );
+        QMessageBox::information(this, "ОШИБКА", "такой записи не существует!");
         return;
     }
     QStringList list;
@@ -96,16 +99,59 @@ void MainWindow::on_itemSendCoord_triggered()
     qDebug() << targetPort.toLong( Q_NULLPTR, 10 );
     udpSocket.writeDatagram( datagram, targetIp, targetPort.toLong( Q_NULLPTR, 10) );
     makeLogNote( "отправлен пакет" );
+    QMessageBox::information(this, "УСПЕХ", "Пакет отправлен успешно");
     bool x = logger->makeNote( 1, getCurrentDateAndTime(), 1, data, 2);
     if ( x ) {
-        makeLogNote( "успех" );
+        makeLogNote( "запись действия добавлена в БД" );
     }
         else {
-        makeLogNote( "FAIL" );
+        makeLogNote( "ошиба записи действия в БД" );
     }
 }
 
-QString MainWindow::makeDatagram( QString q )
+void MainWindow::on_itemSendRocket_triggered()
+{
+    QString trash;
+    DelDialog dia;
+    if ( dia.exec() ) {
+        trash = dia.value();
+    }
+    QString data = makeDatagramRocket( trash );
+    if ( data == "error" ) {
+        makeLogNote( "ошибка создания датаграммы" );
+        QMessageBox::information(this, "ОШИБКА", "такой записи не существует!");
+        return;
+    }
+    QStringList list;
+    list << myIp.toString()
+         << targetIp.toString()
+         << "17"
+         << QString::number( data.length() + 224 )
+         << myPort
+         << targetPort
+         << QString::number( data.length() )
+         << ""
+         << "0001"
+         << QString::number( unicumMessageId )
+         << "1"
+         << "1"
+         << data;
+    unicumMessageId++;
+    QByteArray datagram = converter->encode( list );
+    qDebug() << targetPort.toLong( Q_NULLPTR, 10 );
+    udpSocket.writeDatagram( datagram, targetIp, targetPort.toLong( Q_NULLPTR, 10) );
+    makeLogNote( "отправлен пакет" );
+    QMessageBox::information(this, "УСПЕХ", "Пакет отправлен успешно");
+    bool x = logger->makeNote( 1, getCurrentDateAndTime(), 1, data, 2);
+    if ( x ) {
+        makeLogNote( "запись действия добавлена в БД" );
+    }
+        else {
+        makeLogNote( "ошиба записи действия в БД" );
+    }
+}
+
+QString MainWindow::makeDatagramCoord( QString q )
 {
     QString answer = "";
     answer.append( "0" );                        //метод сжатия
@@ -134,6 +180,51 @@ QString MainWindow::makeDatagram( QString q )
             answer.append( ";" );
         }
     }
+    answer.append( "\r" );
+    return answer;
+}
+
+QString MainWindow::makeDatagramRocket( QString q )
+{
+    QString answer = "";
+    answer.append( "0" );                        //метод сжатия
+    answer.append( converter->dobei( q , 6 ) );      //отправитель добить до 6
+    answer.append( converter->dobei( "mbu" , 6) );  //получатель
+    answer.append( "0" );                        //категория данных
+    answer.append( "C" );                        //данные о сообщении
+    answer.append( "T1" );                       //Идентификатор приложения, которое  должно обрабатывать переданные данные.
+    answer.append( "=" );                        //Признак начала передаваемых данных
+    QSqlQuery query= QSqlQuery( db );
+    QString s;
+    s = "SELECT type_tid FROM own_forces.rocket WHERE combatobjectid='"+q+"';";
+    if ( !query.exec( s ) ) {
+        makeLogNote("cant select");
+    }
+    else {
+        if ( query.size() == 0 ) return "error";
+        while ( query.next() ) {
+            if (QString::compare( query.value( 0 ).toString(), "51.50.10") == 0) {
+                answer.append( "11" );
+                answer.append( ";" );
+            }
+            if (QString::compare( query.value( 0 ).toString(), "51.50.15") == 0) {
+                answer.append( "12" );
+                answer.append( ";" );
+            }
+            if (QString::compare( query.value( 0 ).toString(), "51.50.20") == 0) {
+                answer.append( "13" );
+                answer.append( ";" );
+            }
+            if (QString::compare( query.value( 0 ).toString(), "51.50.25") == 0) {
+                answer.append( "14" );
+                answer.append( ";" );
+            }
+            if (QString::compare( query.value( 0 ).toString(), "51.50.30") == 0) {
+                answer.append( ";" );
+            }
+        }
+    }
+    qDebug() << answer;
     answer.append( "\r" );
     return answer;
 }

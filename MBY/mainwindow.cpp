@@ -76,8 +76,7 @@ void MainWindow::readDatagram()
           << "1";
     unicumMessageId++;
     QByteArray datagram2 = converter->generateReceiptResponse( dataMembersList );
-    qDebug() << targetPort.toLong( Q_NULLPTR, 10 );
-    udpSocket.writeDatagram( datagram2, targetIp, 5825 );
+    udpSocket.writeDatagram( datagram2, targetIp, targetPort.toLong( Q_NULLPTR, 10 ) );
     if ( logger->makeNote( 1, getCurrentDateAndTime(), 1, datagram2, 2 ) ) {
         makeLogNote( "отправлено подтверждение получения" );
     }
@@ -164,6 +163,23 @@ void MainWindow::parsingMessage( QString s )
             source += s.at( i );
         }
     }
+    QString messageCode;
+    for ( int i = 15; i < 17; i++ )
+    {
+        messageCode+=s.at( i );
+    }
+    qDebug() << messageCode;
+    qDebug() << QString::compare( messageCode, "T1");
+    if (QString::compare( messageCode, "C1") == 0) {
+        parsingCoord(s, object);
+    }
+    if (QString::compare( messageCode, "T1") == 0) {
+        parsingRocket(s, object);
+    }
+}
+
+void MainWindow::parsingCoord( QString s, QString object)
+{
     QString data = "";
     for ( int i = 18; i < s.size(); i++ )
     {
@@ -189,6 +205,38 @@ void MainWindow::parsingMessage( QString s )
     else {
         makeLogNote( "ошибка запроса" );
     }
+}
+
+void MainWindow::parsingRocket(QString s, QString object)
+{
+    QString data = "";
+    for ( int i = 18; i < s.size(); i++ )
+    {
+        data += s.at( i );
+    }
+    QString x;
+    int i = 0;
+    qDebug() << data;
+    while ( i < data.size() ) {
+        if (data.at(i) != ';') {
+            x.append( data.at(i) );
+        }
+        else {
+            QSqlQuery query = QSqlQuery( db );
+            QString queryString;
+            queryString = "UPDATE own_forces.rocket SET type_tid='"+ x + "', date_edit='"+ getCurrentDateAndTime() + "' WHERE combatobjectid='"+object+"';";
+            qDebug() << queryString;
+            x="";
+            if ( !query.exec( queryString ) ) {
+                makeLogNote( "ошибка запроса" );
+                return;
+            }
+            else {
+            }
+        }
+        i++;
+    }
+    makeLogNote( "база обновлена" );
 }
 
 QString MainWindow::getCurrentDateAndTime()
